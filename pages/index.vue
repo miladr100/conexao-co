@@ -1,5 +1,5 @@
 <template>
-  <v-parallax :src="require('~/static/img/fullscreen-pagina1-background.png')" height="700">
+  <div class="page-background">
     <!--##### MOBILE -->
     <div v-if="smAndDown" class="page-content d-flex flex-column">
         <p>preparem-se</p>
@@ -112,7 +112,7 @@
                     <p class="page-content__date-w">
                       Agora é sua vez de contribuir com o conexão!
                     </p>
-                    <p class="page-content__date-w top--un4">
+                    <p class="page-content__date-w">
                       Compartilhe o evento com seus amigos ;)
                     </p>
                 </span>
@@ -120,9 +120,9 @@
                     <span
                     class="iconify"
                     data-icon="mdi:whatsapp"
-                    style="color: #fada39"
-                    data-width="46"
-                    data-height="46"
+                    style="color: #ef815d"
+                    data-width="52"
+                    data-height="52"
                     ></span>
                 </div>
             </div>
@@ -136,7 +136,7 @@
         </button>
         </div>
     </div>
-  </v-parallax>
+  </div>
   
 </template>
 
@@ -308,11 +308,11 @@ export default {
       const name = this.form.name?.split(' ')[0]
       if (name) header = `Oi oi, aqui é ${this.form.name.split(' ')[0]} :)`
       const message = window.encodeURIComponent(`${header}
-      👋 Vim te convidar para a 2ª nomeação de Jovens Embaixadores da Paz, com discussões sobre "Qual é o seu legado?"
-      Conheça experiências e lições de vida de jovens de destaque, e saiba como eles superam os desafios da vida para construir um legado!!
-      📆 Sábado, 14 de agosto, às 16 hrs 
+      👋 Vim te convidar para a 4ª Conexão Centro Oeste, com o tema A Primavera que existe em você!"
+      Conheça experiências e lições de vida de jovens, e saiba como eles superam os desafios da vida com o florescer da juventude!
+      📆 Domingo, 26 de setembro, às 16 hrs (Brasília) e 15 hrs (MS e MT)
       
-      Inscreva-se agora pelo link: https://embaixadorespaz.vercel.app/`)
+      Inscreva-se agora pelo link: https://https://conexaoco.vercel.app/`)
       window
         .open(`https://api.whatsapp.com/send?text=${message}`, '_blank')
         .focus()
@@ -337,8 +337,17 @@ $color-brown:  #754b28;
 $color-brown-dark:  #462c16;
 $color-brown-light:  #754b2875;
 
+.page-background {
+  background: url(https://i.ibb.co/VWxv48h/fullscreen-pagina1-background.png) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  height: 100%;
+}
+
 .page-content {
-    margin-top: -28vh;
+    margin-top: 8vh;
     margin-left: 7vw;
 
     &__title {
@@ -551,6 +560,22 @@ $color-brown-light:  #754b2875;
 
       option {
         font-size: 14px;
+      }
+    }
+
+    &__subscribed {
+      &-w {
+        font-size: 2.5rem;
+        font-weight: 500;
+        color: $color-brown-dark;
+        margin: 36px 0 36px 2vw;
+      }
+      &-m {
+        font-size: 24px;
+        font-weight: 500;
+        color: #f2de79;
+        text-align: center;
+        margin: 42px 0;
       }
     }
 
