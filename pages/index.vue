@@ -1,17 +1,134 @@
 <template>
   <div class="page-background">
     <!--##### MOBILE -->
-    <div v-if="smAndDown" class="page-content d-flex flex-column">
-        <p>preparem-se</p>
-        <p>iv conexão centro-oeste</p>
+    <div v-if="smAndDown" class="page-content d-flex flex-column align-center" style="margin-top: 28vh;">
+        <p class="page-content__title-m">preparem-se</p>
+        <p class="page-content__subtitle-m">iv conexão centro-oeste</p>
 
-        <p>A primavera que existe em você</p>
+        <img
+            class="page-content__theme-m"
+            src="~/static/img/primavera-text.png"
+        />
 
-        <p>em 26 de Setembro</p>
+        <p class="page-content__date-m">em 26 de Setembro</p>
+
+        <div> 
+            <button
+                v-if="showButton"
+                class="button button__subscribe-m"
+                @click="subscribe()"
+            >
+                Inscreva-se
+            </button>
+            <form
+              v-if="!showButton && !isSubscribed"
+              class="form-m d-flex flex-column"
+            >
+              <div class="d-flex align-center justify-space-between">
+                  <label class="label-m" for="name">Nome</label>
+                  <input
+                  id="name"
+                  v-model="form.name"
+                  style="width: 100%"
+                  class="input-m"
+                  type="text"
+                  name="name"
+                  placeholder="Digite seu nome completo"
+                  />
+              </div>
+              <div class="d-flex align-center justify-space-between">
+                  <label class="label-m" for="email">Email</label>
+                  <input
+                  id="email"
+                  v-model="form.email"
+                  style="width: 100%"
+                  class="input-m"
+                  type="text"
+                  name="email"
+                  placeholder="Digite seu melhor email"
+                  />
+              </div>
+              <div class="d-flex align-center justify-space-between mt-1">
+                  <select
+                    id="state"
+                    v-model="form.state"
+                    class="select-state select-state-m"
+                    name="state"
+                    form="stateform"
+                  >
+                    <option value="" disabled="disabled" selected="selected">
+                        Estado
+                    </option>
+                    <option
+                        v-for="(state, i) in allStates"
+                        :key="i"
+                        :value="state.value"
+                    >
+                        {{ state.short }}
+                    </option>
+                  </select>
+
+                  <select
+                    id="city"
+                    v-model="form.city"
+                    :disabled="allCities.length == 0"
+                    style="width: 100%"
+                    class="select-state select-state-m"
+                    name="city"
+                    form="stateform"
+                  >
+                    <option value="" disabled="disabled" selected="selected">
+                        Cidade
+                    </option>
+                    <option
+                        v-for="(city, i) in allCities"
+                        :key="i"
+                        :value="city.value"
+                    >
+                        {{ city.value }}
+                    </option>
+                  </select>
+              </div>
+            </form>
+
+            <p v-if="isSubscribed" class="page-content__subscribed-m">
+                Inscrição realizada com sucesso!
+            </p>
+            <div
+                v-if="isSubscribed"
+                class="d-flex flex-row align-center mb-4"
+            >
+                <span>
+                    <p class="page-content__date-m">
+                      Agora é sua vez de contribuir com o conexão!
+                    </p>
+                    <p class="page-content__date-m">
+                      Compartilhe o evento com seus amigos ;)
+                    </p>
+                </span>
+                <div @click="shareViaWhatsApp()">
+                    <span
+                    class="iconify"
+                    data-icon="mdi:whatsapp"
+                    style="color: #ef815d"
+                    data-width="30"
+                    data-height="30"
+                    ></span>
+                </div>
+            </div>
+
+            <button
+                v-if="!showButton && !isSubscribed"
+                class="button button__send-m"
+                @click="handleSubmit('mobile')"
+            >
+                Enviar
+            </button>
+        </div>
     </div>
 
     <!--##### WEB -->
-    <div v-else class="page-content d-flex flex-column">
+    <div v-else class="page-content page-content-web d-flex flex-column">
         <p class="page-content__title-w">preparem-se</p>
         <p class="page-content__subtitle-w">iv conexão centro-oeste</p>
 
@@ -133,7 +250,7 @@
                 @click="handleSubmit('web')"
             >
                 Enviar
-        </button>
+            </button>
         </div>
     </div>
   </div>
@@ -344,11 +461,22 @@ $color-brown-light:  #754b2875;
   -o-background-size: cover;
   background-size: cover;
   height: 100%;
+
+  @media (max-width: 600px ) {
+    background: url(https://i.ibb.co/phcwx08/mobile-pagina1-background.png) no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 100%;
+  }
 }
 
 .page-content {
-    margin-top: 8vh;
-    margin-left: 7vw;
+    &-web {
+      margin-top: 8vh;
+      margin-left: 7vw;
+    }
 
     &__title {
       &-w {
@@ -359,7 +487,7 @@ $color-brown-light:  #754b2875;
         
       }
       &-m {
-        font-size: 3.5rem;
+        font-size: 1.6rem;
         text-transform: uppercase;
         font-weight: 800;
         color: $color-orange;
@@ -371,14 +499,14 @@ $color-brown-light:  #754b2875;
         font-size: 2.5rem;
         text-transform: uppercase;
         font-weight: 500;
-        margin-top: -4.5vh;
+        margin-top: -28px;
         color: $color-yellow;
       }
       &-m {
-        font-size: 2.5rem;
+        font-size: 1.2rem;
         text-transform: uppercase;
         font-weight: 500;
-        margin-top: -4.5vh;
+        margin-top: -18px;
         color: $color-yellow;
       }
     }
@@ -389,8 +517,8 @@ $color-brown-light:  #754b2875;
             width: 620px;
         }
         &-m {
-            height: 60%;
-            width: 50%;
+            height: 120px;
+            width: 280px;
         }
     }
 
@@ -402,10 +530,11 @@ $color-brown-light:  #754b2875;
             color: $color-brown;
         }
         &-m {
-            margin-left: 1vw;
-            font-size: 1.5rem;
+            font-size: 1rem;
             font-weight: 500;
+            text-align: center;
             color: $color-brown;
+            margin-top: 0.5rem;
         }
     }
 
@@ -441,13 +570,14 @@ $color-brown-light:  #754b2875;
           font-weight: 400;
           padding: 4px 42px;
           margin: 14px 0;
-          margin-left: 11vw;
+          margin-left: 8.5rem;
         }
         &-m {
           font-size: 18px;
           font-weight: 400;
           padding: 6px 32px;
           margin: 12px 0;
+          margin-left: 5rem;
         }
       }
     }
@@ -485,7 +615,7 @@ $color-brown-light:  #754b2875;
         max-width: 34vw;
       }
       &-m {
-        margin: 18px 0;
+        margin: 8px 0;
       }
     }
 
@@ -571,11 +701,11 @@ $color-brown-light:  #754b2875;
         margin: 36px 0 36px 2vw;
       }
       &-m {
-        font-size: 24px;
+        font-size: 1.5rem;
         font-weight: 500;
-        color: #f2de79;
+        color: $color-brown-dark;
         text-align: center;
-        margin: 42px 0;
+        margin: 28px 0;
       }
     }
 
