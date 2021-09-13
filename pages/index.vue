@@ -259,6 +259,9 @@
 
 <script>
 import statesAndCities from '~/static/json/estados-cidades.json'
+import { supabase } from "~/plugins/supabase";
+
+const ACTUAL_CONECXAO = 4;
 
 export default {
   name: 'YspLeadsIndex',
@@ -281,6 +284,7 @@ export default {
       },
       allStates: [],
       allCities: [],
+      oldLeads: [],
     }
   },
   computed: {
@@ -307,12 +311,26 @@ export default {
         this.getAndSetCitiesByStateCodeAsync(chosenState)
       }
     },
+    'form.name'(payload) {
+      if(payload) {
+        console.log(this.oldLeads.filter(lead => lead.name.toLowerCase().includes(payload.toLowerCase())))
+      }
+    }
   },
   mounted() {
     this.allStates = this.formatDataFromIbge(this.allStatesOfBrazil)
+    this.getLeadsAsync();
     // this.sendAnalyticsData()
   },
   methods: {
+    async getLeadsAsync() {
+
+          const { data } = await supabase
+              .from("leads")
+              .select(`*`)
+            this.oldLeads = this.organizeLeads(data.filter(lead => lead.conexao !== ACTUAL_CONECXAO))
+            // console.log(this.oldLeads);
+    },
     subscribe() {
       this.sendAnalyticsData('button_subscribe')
       this.showButton = false

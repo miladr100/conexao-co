@@ -11,24 +11,24 @@
                     <v-card-subtitle class="d-flex justify-center">Nº Inscritos</v-card-subtitle>  
                 </v-card>
             </v-col>
-            <v-col cols="6" lg="2" md="3" sm="4" xs="6">
+            <!-- <v-col cols="6" lg="2" md="3" sm="4" xs="6">
                 <v-card>
                     <v-card-title class="d-flex justify-center">{{numbOfAccess}}</v-card-title>
                     <v-card-subtitle class="d-flex justify-center">Nº Acessos</v-card-subtitle>  
                 </v-card>
-            </v-col>
-            <v-col cols="6" lg="3" md="4" sm="5" xs="6">
+            </v-col> -->
+            <!-- <v-col cols="6" lg="3" md="4" sm="5" xs="6">
                 <v-card>
                     <v-card-title class="d-flex justify-center">{{numbOfButtonSubscribe}}</v-card-title>
                     <v-card-subtitle class="d-flex justify-center">Nº Cliques Inscrição</v-card-subtitle>  
                 </v-card>
-            </v-col>
-            <v-col cols="6" lg="2" md="3" sm="4" xs="6">
+            </v-col> -->
+            <!-- <v-col cols="6" lg="2" md="3" sm="4" xs="6">
                 <v-card>
                     <v-card-title class="d-flex justify-center">{{numbOfShareWhatsApp}}</v-card-title>
                     <v-card-subtitle class="d-flex justify-center">Share Wpp</v-card-subtitle>  
                 </v-card>
-            </v-col>
+            </v-col> -->
         </v-row>
         <v-data-table
             :headers="headers"
@@ -40,6 +40,9 @@
 </template>
 
 <script>
+import { supabase } from "~/plugins/supabase";
+
+const ACTUAL_CONECXAO = 4;
 
   export default {
     name: "YDashboard",
@@ -48,6 +51,7 @@
     data () {
       return {
         allLeads: [],
+        ondLeads: [],
         numbOfSubscriptions: 0,
         numbOfAccess: 0,
         numbOfButtonSubscribe: 0,
@@ -69,8 +73,7 @@
       }
     },
     async mounted() {
-        await this.getAllLeadsAsync()
-        await this.getAccessAnalyticsAsync()
+        await this.update();
     },
     methods: {
         async getAccessAnalyticsAsync() {
@@ -89,9 +92,12 @@
         },
         async getAllLeadsAsync() {
             try {
-                this.$axios.setHeader('apikey', process.env.SUPABASE_API_KEY)
-                const { data } = await this.$axios.get('leads')
-                this.allLeads = this.organizeLeads(data)
+                const { data } = await supabase
+                    .from("leads")
+                    .select(`*`)
+                this.allLeads = this.organizeLeads(data.filter(lead => lead.conexao === ACTUAL_CONECXAO))
+                this.ondLeads = this.organizeLeads(data.filter(lead => lead.conexao !== ACTUAL_CONECXAO))
+                console.log(this.ondLeads);
                 this.numbOfSubscriptions = this.allLeads.length
             } catch (err) {
                 this.$toast.open({message: "Falha ao obter leads", type: "error"})
@@ -109,12 +115,12 @@
         },
         async update() {
             await this.getAllLeadsAsync()
-            await this.getAccessAnalyticsAsync()
+            // await this.getAccessAnalyticsAsync()
             this.$toast.open({message: "Dados atualizados com sucesso!", type: "success"})
         },
         exit() {
             this.$store.commit('updateIsLogged', false)
-        }
+        },
     }
   }
 </script>

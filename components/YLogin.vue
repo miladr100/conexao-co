@@ -59,11 +59,11 @@ export default({
         } else this.$toast.open({message: "Por favor preencha o login e a senha", type: "warning"})
     },
     validateLogin() {
-        if (this.email !== 'yspadmin@ysp.com') {
+        if (this.email !== 'conexaocoadmin@conexaoco.com') {
             this.$toast.open({message: "Erro! email não cadastrado", type: "error"})
             return false
         }
-        if (this.password !== 'yspadmin123') {
+        if (this.password !== 'conexao123') {
             this.$toast.open({message: "Erro! senha inválida", type: "error"})
             return false
         }
