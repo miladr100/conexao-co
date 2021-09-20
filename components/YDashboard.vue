@@ -1,9 +1,21 @@
 <template>
     <div class="d-flex flex-column">
         <v-row justify="center" class="mt-6 px-4">
-            <v-col cols="4" lg="2" md="2" sm="4" xs="4" align="center" >
+            <v-col cols="4" lg="1" md="1" sm="4" xs="4" align="center" class="mr-4">
                 <v-btn class="mb-2" @click="update()">Atualizar</v-btn>
                 <v-btn @click="exit()">Sair</v-btn>
+            </v-col>
+            <v-col cols="6" lg="2" md="3" sm="4" xs="6">
+                <v-card>
+                    <v-card-title class="d-flex justify-center">200</v-card-title>
+                    <v-card-subtitle class="d-flex justify-center">META DE INSCRITOS</v-card-subtitle>  
+                </v-card>
+            </v-col>
+            <v-col cols="6" lg="2" md="3" sm="4" xs="6">
+                <v-card>
+                    <v-card-title class="d-flex justify-center">{{subscriptionProgress}}</v-card-title>
+                    <v-card-subtitle class="d-flex justify-center">PROGRESSO</v-card-subtitle>  
+                </v-card>
             </v-col>
             <v-col cols="6" lg="2" md="3" sm="4" xs="6">
                 <v-card>
@@ -11,24 +23,36 @@
                     <v-card-subtitle class="d-flex justify-center">Nº Inscritos</v-card-subtitle>  
                 </v-card>
             </v-col>
-            <!-- <v-col cols="6" lg="2" md="3" sm="4" xs="6">
+            <v-col cols="6" lg="2" md="3" sm="4" xs="6">
                 <v-card>
-                    <v-card-title class="d-flex justify-center">{{numbOfAccess}}</v-card-title>
-                    <v-card-subtitle class="d-flex justify-center">Nº Acessos</v-card-subtitle>  
+                    <v-card-title class="d-flex justify-center">{{numbOfMs}}</v-card-title>
+                    <v-card-subtitle class="d-flex justify-center">Inscritos MS</v-card-subtitle>  
                 </v-card>
-            </v-col> -->
-            <!-- <v-col cols="6" lg="3" md="4" sm="5" xs="6">
+            </v-col>
+            <v-col cols="6" lg="2" md="3" sm="4" xs="6">
                 <v-card>
-                    <v-card-title class="d-flex justify-center">{{numbOfButtonSubscribe}}</v-card-title>
-                    <v-card-subtitle class="d-flex justify-center">Nº Cliques Inscrição</v-card-subtitle>  
+                    <v-card-title class="d-flex justify-center">{{numbOfMt}}</v-card-title>
+                    <v-card-subtitle class="d-flex justify-center">Inscritos MT</v-card-subtitle>  
                 </v-card>
-            </v-col> -->
-            <!-- <v-col cols="6" lg="2" md="3" sm="4" xs="6">
+            </v-col>
+            <v-col cols="6" lg="2" md="3" sm="4" xs="6">
                 <v-card>
-                    <v-card-title class="d-flex justify-center">{{numbOfShareWhatsApp}}</v-card-title>
-                    <v-card-subtitle class="d-flex justify-center">Share Wpp</v-card-subtitle>  
+                    <v-card-title class="d-flex justify-center">{{numbOfGo}}</v-card-title>
+                    <v-card-subtitle class="d-flex justify-center">Inscritos GO</v-card-subtitle>  
                 </v-card>
-            </v-col> -->
+            </v-col>
+            <v-col cols="6" lg="2" md="3" sm="4" xs="6">
+                <v-card>
+                    <v-card-title class="d-flex justify-center">{{numbOfDf}}</v-card-title>
+                    <v-card-subtitle class="d-flex justify-center">Inscritos DF</v-card-subtitle>  
+                </v-card>
+            </v-col>
+            <v-col cols="6" lg="2" md="3" sm="4" xs="6">
+                <v-card>
+                    <v-card-title class="d-flex justify-center">{{numbOfOthers}}</v-card-title>
+                    <v-card-subtitle class="d-flex justify-center">Inscritos Outros Estados</v-card-subtitle>  
+                </v-card>
+            </v-col>
         </v-row>
         <v-data-table
             :headers="headers"
@@ -51,11 +75,13 @@ const ACTUAL_CONECXAO = 4;
     data () {
       return {
         allLeads: [],
-        ondLeads: [],
+        oldLeads: [],
         numbOfSubscriptions: 0,
-        numbOfAccess: 0,
-        numbOfButtonSubscribe: 0,
-        numbOfShareWhatsApp: 0,
+        numbOfMs: 0,
+        numbOfMt: 0,
+        numbOfGo: 0,
+        numbOfDf: 0,
+        numbOfOthers: 0,
         headers: [
             { text: 'ID', value: 'id' },
             { text: 'Criado em', value: 'created_at' },
@@ -71,6 +97,11 @@ const ACTUAL_CONECXAO = 4;
             { text: 'Dispositivo', value: 'device', sortable: false },
         ],
       }
+    },
+    computed: {
+        subscriptionProgress() {
+            return `${Math.trunc((this.numbOfSubscriptions/200)*100)}%`;
+        }
     },
     async mounted() {
         await this.update();
@@ -96,8 +127,7 @@ const ACTUAL_CONECXAO = 4;
                     .from("leads")
                     .select(`*`)
                 this.allLeads = this.organizeLeads(data.filter(lead => lead.conexao === ACTUAL_CONECXAO))
-                this.ondLeads = this.organizeLeads(data.filter(lead => lead.conexao !== ACTUAL_CONECXAO))
-                console.log(this.ondLeads);
+                this.oldLeads = this.organizeLeads(data.filter(lead => lead.conexao !== ACTUAL_CONECXAO))
                 this.numbOfSubscriptions = this.allLeads.length
             } catch (err) {
                 this.$toast.open({message: "Falha ao obter leads", type: "error"})
@@ -113,9 +143,17 @@ const ACTUAL_CONECXAO = 4;
                 return lead
             })
         },
+        calcAnalytics() {
+            this.numbOfMs = this.organizeLeads(this.allLeads.filter(lead => lead.state === "Mato Grosso do Sul")).length
+            this.numbOfGo = this.organizeLeads(this.allLeads.filter(lead => lead.state === "Goiás")).length
+            this.numbOfDf = this.organizeLeads(this.allLeads.filter(lead => lead.state === "Distrito Federal")).length
+            this.numbOfMt = this.organizeLeads(this.allLeads.filter(lead => lead.state === "Mato Grosso")).length
+            this.numbOfOthers = this.numbOfSubscriptions - this.numbOfMs - this.numbOfGo - this.numbOfDf - this.numbOfMt
+        },
         async update() {
             await this.getAllLeadsAsync()
             // await this.getAccessAnalyticsAsync()
+            this.calcAnalytics()
             this.$toast.open({message: "Dados atualizados com sucesso!", type: "success"})
         },
         exit() {
