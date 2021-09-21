@@ -24,25 +24,25 @@
                 </v-card>
             </v-col>
             <v-col cols="6" lg="2" md="3" sm="4" xs="6">
-                <v-card>
+                <v-card :color="filter === 'Mato Grosso do Sul' ? 'green lighten-4' : ''" @click="filterLeads(`Mato Grosso do Sul`)">
                     <v-card-title class="d-flex justify-center">{{numbOfMs}}</v-card-title>
                     <v-card-subtitle class="d-flex justify-center">Inscritos MS</v-card-subtitle>  
                 </v-card>
             </v-col>
             <v-col cols="6" lg="2" md="3" sm="4" xs="6">
-                <v-card>
+                <v-card :color="filter === 'Mato Grosso' ? 'green lighten-4' : ''" @click="filterLeads(`Mato Grosso`)">
                     <v-card-title class="d-flex justify-center">{{numbOfMt}}</v-card-title>
                     <v-card-subtitle class="d-flex justify-center">Inscritos MT</v-card-subtitle>  
                 </v-card>
             </v-col>
             <v-col cols="6" lg="2" md="3" sm="4" xs="6">
-                <v-card>
+                <v-card :color="filter === 'Goiás' ? 'green lighten-4' : ''" @click="filterLeads(`Goiás`)">
                     <v-card-title class="d-flex justify-center">{{numbOfGo}}</v-card-title>
                     <v-card-subtitle class="d-flex justify-center">Inscritos GO</v-card-subtitle>  
                 </v-card>
             </v-col>
             <v-col cols="6" lg="2" md="3" sm="4" xs="6">
-                <v-card>
+                <v-card :color="filter === 'Distrito Federal' ? 'green lighten-4' : ''" @click="filterLeads(`Distrito Federal`)">
                     <v-card-title class="d-flex justify-center">{{numbOfDf}}</v-card-title>
                     <v-card-subtitle class="d-flex justify-center">Inscritos DF</v-card-subtitle>  
                 </v-card>
@@ -54,16 +54,21 @@
                 </v-card>
             </v-col>
         </v-row>
-        <v-data-table
-            :headers="headers"
-            :items="allLeads"
-            :items-per-page="5"
-            class="elevation-1 mt-2"
-        ></v-data-table>
+        <v-row justify="center">
+            <v-col cols="12" lg="11" md="111" sm="12" xs="12">
+                <v-data-table
+                    :headers="headers"
+                    :items="allLeads"
+                    :items-per-page="5"
+                    class="elevation-1 mt-2"
+                ></v-data-table>
+            </v-col>
+        </v-row>
     </div>
 </template>
 
 <script>
+import { cloneDeep } from "lodash"
 import { supabase } from "~/plugins/supabase";
 
 const ACTUAL_CONECXAO = 4;
@@ -82,6 +87,7 @@ const ACTUAL_CONECXAO = 4;
         numbOfGo: 0,
         numbOfDf: 0,
         numbOfOthers: 0,
+        filter: '',
         headers: [
             { text: 'ID', value: 'id' },
             { text: 'Criado em', value: 'created_at' },
@@ -104,7 +110,8 @@ const ACTUAL_CONECXAO = 4;
         }
     },
     async mounted() {
-        await this.update();
+        await this.getAllLeadsAsync();
+        this.calcAnalytics()
     },
     methods: {
         async getAccessAnalyticsAsync() {
@@ -126,9 +133,11 @@ const ACTUAL_CONECXAO = 4;
                 const { data } = await supabase
                     .from("leads")
                     .select(`*`)
-                this.allLeads = this.organizeLeads(data.filter(lead => lead.conexao === ACTUAL_CONECXAO))
+                const allLeads = this.organizeLeads(data.filter(lead => lead.conexao === ACTUAL_CONECXAO))
                 this.oldLeads = this.organizeLeads(data.filter(lead => lead.conexao !== ACTUAL_CONECXAO))
-                this.numbOfSubscriptions = this.allLeads.length
+                this.numbOfSubscriptions = allLeads.length
+                this.$store.commit('updateAllLeads', cloneDeep(allLeads))
+                this.allLeads = cloneDeep(allLeads)
             } catch (err) {
                 this.$toast.open({message: "Falha ao obter leads", type: "error"})
             }
@@ -149,6 +158,15 @@ const ACTUAL_CONECXAO = 4;
             this.numbOfDf = this.organizeLeads(this.allLeads.filter(lead => lead.state === "Distrito Federal")).length
             this.numbOfMt = this.organizeLeads(this.allLeads.filter(lead => lead.state === "Mato Grosso")).length
             this.numbOfOthers = this.numbOfSubscriptions - this.numbOfMs - this.numbOfGo - this.numbOfDf - this.numbOfMt
+        },
+        filterLeads(filterString) {
+            if (this.filter === filterString) {
+                this.allLeads = cloneDeep(this.$store.state.allLeads)
+                this.filter = ""
+            } else {
+                this.allLeads = this.organizeLeads(cloneDeep(this.$store.state.allLeads).filter(lead => lead.state === filterString))
+                this.filter = filterString
+            }    
         },
         async update() {
             await this.getAllLeadsAsync()
