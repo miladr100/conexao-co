@@ -144,12 +144,14 @@ const ACTUAL_CONECXAO = 4;
         },
         organizeLeads(arrLeads) {
             return arrLeads.map(lead => {
-                if(!lead.state) lead.state = ' - '
-                if(!lead.city) lead.city = ' - '
-                if(!lead.device) lead.device = ' - '
-                if(!lead.phone) lead.phone = ' - '
-                lead.created_at = this.$moment(lead.created_at).format("DD/MM/YYYY")
-                return lead
+                const newLead = {...lead}
+                if(!lead.state) newLead.state = ' - '
+                if(!lead.city) newLead.city = ' - '
+                if(!lead.device) newLead.device = ' - '
+                if(!lead.phone) newLead.phone = ' - '
+                const time = `${newLead.created_at.split("T")[0]}`
+                newLead.created_at = time
+                return newLead
             })
         },
         calcAnalytics() {
