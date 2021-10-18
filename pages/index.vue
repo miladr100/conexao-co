@@ -1,18 +1,41 @@
 <template>
   <div class="page-background">
     <!--##### MOBILE -->
-    <div v-if="smAndDown" class="page-content d-flex flex-column align-center" style="margin-top: 28vh;">
-        <p class="page-content__title-m">preparem-se</p>
-        <p class="page-content__subtitle-m">iv conexão centro-oeste</p>
+    <div v-if="smAndDown" class="page-content" style="border-radius: 30px;">
+        <div class="page-content__header-m d-flex align-center">
+          <img
+              class="page-content__theme-title-m ml-12"
+              src="~/static/img/conexoes-title.png"
+            />
+        </div>
 
-        <img
-            class="page-content__theme-m"
-            src="~/static/img/primavera-text.png"
-        />
+        <div class="page-content-mobile d-flex flex-column justify-space-between">
+          <div class="d-flex flex-column align-center">
+            <img
+              class="page-content__theme-m mt-2"
+              src="~/static/img/conexoes-text-mobile.png"
+            />
 
-        <p class="page-content__date-m">em 26 de Setembro</p>
+            <!-- <button
+              v-if="showButton"
+              class="button button__subscribe-w mt-16 mr-6"
+              @click="subscribe()"
+              >
+                Faça seu Chek-in
+            </button> -->
+          </div>
 
-        <div> 
+          <img
+            class="page-content__theme-infos-m ml-4"
+            src="~/static/img/conexoes-infos-mobile.png"
+          />
+
+          <img
+            class="page-content__theme-code-m ml-4"
+            src="~/static/img/conexoes-code-mobile.png"
+          />
+        </div>
+        <!-- <div> 
             <button
                 v-if="showButton"
                 class="button button__subscribe-m"
@@ -124,22 +147,43 @@
             >
                 Enviar
             </button>
-        </div>
+        </div> -->
     </div>
 
     <!--##### WEB -->
-    <div v-else class="page-content page-content-web d-flex flex-column">
-        <p class="page-content__title-w">preparem-se</p>
-        <p class="page-content__subtitle-w">iv conexão centro-oeste</p>
+    <div v-else class="page-content" style="border-radius: 60px;">
+        <div class="page-content__header-w d-flex align-center">
+          <img
+              class="page-content__theme-title-w ml-12"
+              src="~/static/img/conexoes-title.png"
+            />
+        </div>
 
-        <img
-            class="page-content__theme-w"
-            src="~/static/img/primavera-text.png"
-        />
+        <div class="page-content-web d-flex justify-space-between">
+          <div class="d-flex flex-column align-center">
+            <img
+              class="page-content__theme-w mt-2"
+              src="~/static/img/conexoes-text.png"
+            />
 
-        <p class="page-content__date-w">em 26 de Setembro</p>
+            <button
+              v-if="showButton"
+              class="button button__subscribe-w mt-16 mr-6"
+              @click="subscribe()"
+              >
+                Faça seu Chek-in
+            </button>
+          </div>
 
-        <div> 
+          <img
+            class="page-content__theme-infos-w mt-2"
+            src="~/static/img/conexoes-infos.png"
+          />
+        </div>
+
+        <!-- <p class="page-content__date-w">em 26 de Setembro</p> -->
+
+        <!-- <div> 
             <button
                 v-if="showButton"
                 class="button button__subscribe-w"
@@ -251,7 +295,7 @@
             >
                 Enviar
             </button>
-        </div>
+        </div> -->
     </div>
   </div>
   
@@ -261,7 +305,7 @@
 import statesAndCities from '~/static/json/estados-cidades.json'
 import { supabase } from "~/plugins/supabase";
 
-const ACTUAL_CONECXAO = 4;
+const ACTUAL_CONECXAO = 5;
 
 export default {
   name: 'YspLeadsIndex',
@@ -466,14 +510,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$color-orange: #ef815d;
-$color-yellow: #e78f12;
-$color-brown:  #754b28;
-$color-brown-dark:  #462c16;
-$color-brown-light:  #754b2875;
+$color-primary:  #3cb4e5;
+$color-primary-dark:  #011e41;
+$color-primary-light:  #082a53;
+$color-secondary: #f0f1f1;
+$color-tertiary: #e78f12;
 
 .page-background {
-  background: url(https://i.ibb.co/VWxv48h/fullscreen-pagina1-background.png) no-repeat center center fixed; 
+  background: url(https://i.ibb.co/QPw4c79/mapa.png) no-repeat center center fixed; 
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -481,7 +525,7 @@ $color-brown-light:  #754b2875;
   height: 100%;
 
   @media (max-width: 600px ) {
-    background: url(https://i.ibb.co/phcwx08/mobile-pagina1-background.png) no-repeat center center fixed; 
+    background: url(https://i.ibb.co/QPw4c79/mapa.png) no-repeat center center fixed; 
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
@@ -491,52 +535,86 @@ $color-brown-light:  #754b2875;
 }
 
 .page-content {
+    background-color: $color-secondary;
+    height: 88vh;
+    margin-top: 4vh;
+    margin-left: 4vw;
+    margin-right: 4vw;
+    
     &-web {
-      margin-top: 8vh;
-      margin-left: 7vw;
+      margin-top: 1vh;
+      margin-left: 2vw;
+      margin-right: 3vw;
     }
 
-    &__title {
-      &-w {
-        font-size: 3.5rem;
-        text-transform: uppercase;
-        font-weight: 800;
-        color: $color-orange;
-        
-      }
-      &-m {
-        font-size: 1.6rem;
-        text-transform: uppercase;
-        font-weight: 800;
-        color: $color-orange;
-      }
+    &-mobile {
+      margin-top: 1vh;
+      margin-left: 2vw;
+      margin-right: 3vw;
     }
 
-    &__subtitle {
+    &__header {
       &-w {
-        font-size: 2.5rem;
-        text-transform: uppercase;
-        font-weight: 500;
-        margin-top: -28px;
-        color: $color-yellow;
+        height: 20vh;
+        width: 100%;
+        background-color: $color-primary-dark;
+        border-top-left-radius: 60px;
+        border-top-right-radius: 60px;
       }
       &-m {
-        font-size: 1.2rem;
-        text-transform: uppercase;
-        font-weight: 500;
-        margin-top: -18px;
-        color: $color-yellow;
+        height: 16vh;
+        width: 100%;
+        background-color: $color-primary-dark;
+        border-top-left-radius: 30px;
+        border-top-right-radius: 30px;
       }
     }
 
     &__theme {
         &-w {
-            height: 240px;
-            width: 620px;
+            height: 15vh;
+            width: 56vw;
         }
         &-m {
-            height: 120px;
+            height: 12vh;
+            width: 75vw;
+        }
+    }
+
+    &__theme-infos {
+        &-w {
+            height: 240px;
+            width: 246px;
+        }
+        &-m {
+            height: 68px;
             width: 280px;
+            position: absolute;
+            bottom: 120px;
+        }
+    }
+
+    &__theme-title {
+        &-w {
+            height: 14.6vh;
+            width: 336px;
+        }
+        &-m {
+            height: 66px;
+            width: 226px;
+        }
+    }
+
+    &__theme-code {
+        &-w {
+            height: 14.6vh;
+            width: 336px;
+        }
+        &-m {
+            height: 36px;
+            width: 126px;
+            position: absolute;
+            bottom: 60px;
         }
     }
 
@@ -545,35 +623,36 @@ $color-brown-light:  #754b2875;
             margin-left: 2vw;
             font-size: 1.8rem;
             font-weight: 500;
-            color: $color-brown;
+            color: $color-primary;
         }
         &-m {
             font-size: 1rem;
             font-weight: 500;
             text-align: center;
-            color: $color-brown;
+            color: $color-primary;
             margin-top: 0.5rem;
         }
     }
 
     .button {
       transition-duration: 0.4s;
-      color: $color-brown;
+      color: $color-primary;
       text-transform: uppercase;
-      border: 2px solid $color-brown;
+      border: 2px solid $color-primary;
       border-radius: 60px;
       cursor: pointer;
       &:hover {
         outline: none;
-        border: 2px solid $color-brown-dark;
-        color: $color-brown-dark;
+        border: 2px solid $color-primary-dark;
+        color: $color-primary-dark;
       }
       &__subscribe {
         &-w {
-          font-size: 46px;
+          // font-family: 'Quicksand';
+          font-family: 'Balsamiq Sans';
+          font-size: 36px;
           font-weight: 500;
-          padding: 4px 48px;
-          margin: 24px 0;
+          padding: 4px 32px;
         }
         &-m {
           font-size: 28px;
@@ -605,26 +684,26 @@ $color-brown-light:  #754b2875;
         padding: 12px 20px;
         margin: 6px 0;
         display: inline-block;
-        border: 2px solid $color-brown;
+        border: 2px solid $color-primary;
         border-radius: 24px;
         box-sizing: border-box;
-        color: $color-brown;
+        color: $color-primary;
       }
       &-m[type='text'] {
         padding: 8px 6px;
         margin: 6px 0;
         padding-left: 12px;
         display: inline-block;
-        border: 2px solid $color-brown;
+        border: 2px solid $color-primary;
         border-radius: 24px;
         box-sizing: border-box;
-        color: $color-brown;
+        color: $color-primary;
       }
     }
 
     input:focus {
       outline: none;
-      border: 2px solid $color-brown-dark;
+      border: 2px solid $color-primary-dark;
     }
 
     .form {
@@ -641,22 +720,22 @@ $color-brown-light:  #754b2875;
       &-w {
         font-size: 20px;
         font-weight: 500;
-        color: $color-brown-dark;
+        color: $color-primary-dark;
         margin-right: 32px;
       }
       &-m {
         font-size: 12px;
         font-weight: 500;
-        color: $color-brown-dark;
+        color: $color-primary-dark;
         margin-right: 26px;
       }
     }
 
     .select-state {
       -webkit-appearance: none;
-      color:  $color-brown;
+      color:  $color-primary;
       margin: 0 4px;
-      border: 2px solid  $color-brown;
+      border: 2px solid  $color-primary;
       border-radius: 24px;
       text-align: center;
       cursor: pointer;
@@ -677,18 +756,18 @@ $color-brown-light:  #754b2875;
 
       &:focus {
         outline: none;
-        border: 2px solid  $color-brown-dark;
+        border: 2px solid  $color-primary-dark;
       }
 
       &:hover {
         outline: none;
-        border: 2px solid  $color-brown-dark;
-        color:  $color-brown-dark;
+        border: 2px solid  $color-primary-dark;
+        color:  $color-primary-dark;
       }
 
       &[disabled] {
         outline: none;
-        border: 2px solid $color-brown-light;
+        border: 2px solid $color-primary-light;
         cursor: not-allowed;
       }
     }
@@ -715,13 +794,13 @@ $color-brown-light:  #754b2875;
       &-w {
         font-size: 2.5rem;
         font-weight: 500;
-        color: $color-brown-dark;
+        color: $color-primary-dark;
         margin: 36px 0 36px 2vw;
       }
       &-m {
         font-size: 1.5rem;
         font-weight: 500;
-        color: $color-brown-dark;
+        color: $color-primary-dark;
         text-align: center;
         margin: 28px 0;
       }

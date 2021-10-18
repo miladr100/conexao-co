@@ -4,7 +4,7 @@ export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     titleTemplate: '%s - Centro Oeste',
-    title: '4º Conexão',
+    title: '5º Conexão',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -15,6 +15,8 @@ export default {
       { rel: 'shortcut icon', type: 'image/x-icon', href: '/favicon.ico' },
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
       { rel: 'stylesheet', href: 'https://fonts.googleapis.com/icon?family=Material+Icons' },
+      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Festive&family=Quicksand:wght@400;500&display=swap' },
+      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Balsamiq+Sans&family=Festive&family=Quicksand:wght@400;500&display=swap' },
     ],
     script: [
       { src: "https://code.iconify.design/1/1.0.7/iconify.min.js" }
@@ -69,8 +71,9 @@ export default {
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
-  // customVariables: ['~/assets/variables.scss'],
   vuetify: {
+    defaultAssets: false,
+    treeShake: true,
     theme: {
       dark: false,
       themes: {
