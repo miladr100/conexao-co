@@ -16,13 +16,14 @@
               src="~/static/img/conexoes-text-mobile.png"
             />
 
-            <!-- <button
-              v-if="showButton"
-              class="button button__subscribe-w mt-16 mr-6"
-              @click="subscribe()"
-              >
-                Faça seu Chek-in
-            </button> -->
+            <YSubscriptionForm
+              class="mt-5"
+              button-title="Faça seu Chek-in"
+              submit-button-title="Embarcar!"
+              :is-mobile="smAndDown"
+              :states="allStates"
+              :cities="allCities"
+            />
           </div>
 
           <img
@@ -35,119 +36,6 @@
             src="~/static/img/conexoes-code-mobile.png"
           />
         </div>
-        <!-- <div> 
-            <button
-                v-if="showButton"
-                class="button button__subscribe-m"
-                @click="subscribe()"
-            >
-                Inscreva-se
-            </button>
-            <form
-              v-if="!showButton && !isSubscribed"
-              class="form-m d-flex flex-column"
-            >
-              <div class="d-flex align-center justify-space-between">
-                  <label class="label-m" for="name">Nome</label>
-                  <input
-                  id="name"
-                  v-model="form.name"
-                  style="width: 100%"
-                  class="input-m"
-                  type="text"
-                  name="name"
-                  placeholder="Digite seu nome completo"
-                  />
-              </div>
-              <div class="d-flex align-center justify-space-between">
-                  <label class="label-m" for="email">Email</label>
-                  <input
-                  id="email"
-                  v-model="form.email"
-                  style="width: 100%"
-                  class="input-m"
-                  type="text"
-                  name="email"
-                  placeholder="Digite seu melhor email"
-                  />
-              </div>
-              <div class="d-flex align-center justify-space-between mt-1">
-                  <select
-                    id="state"
-                    v-model="form.state"
-                    class="select-state select-state-m"
-                    name="state"
-                    form="stateform"
-                  >
-                    <option value="" disabled="disabled" selected="selected">
-                        Estado
-                    </option>
-                    <option
-                        v-for="(state, i) in allStates"
-                        :key="i"
-                        :value="state.value"
-                    >
-                        {{ state.short }}
-                    </option>
-                  </select>
-
-                  <select
-                    id="city"
-                    v-model="form.city"
-                    :disabled="allCities.length == 0"
-                    style="width: 100%"
-                    class="select-state select-state-m"
-                    name="city"
-                    form="stateform"
-                  >
-                    <option value="" disabled="disabled" selected="selected">
-                        Cidade
-                    </option>
-                    <option
-                        v-for="(city, i) in allCities"
-                        :key="i"
-                        :value="city.value"
-                    >
-                        {{ city.value }}
-                    </option>
-                  </select>
-              </div>
-            </form>
-
-            <p v-if="isSubscribed" class="page-content__subscribed-m">
-                Inscrição realizada com sucesso!
-            </p>
-            <div
-                v-if="isSubscribed"
-                class="d-flex flex-row align-center mb-4"
-            >
-                <span>
-                    <p class="page-content__date-m">
-                      Agora é sua vez de contribuir com o conexão!
-                    </p>
-                    <p class="page-content__date-m">
-                      Compartilhe o evento com seus amigos ;)
-                    </p>
-                </span>
-                <div @click="shareViaWhatsApp()">
-                    <span
-                    class="iconify"
-                    data-icon="mdi:whatsapp"
-                    style="color: #ef815d"
-                    data-width="30"
-                    data-height="30"
-                    ></span>
-                </div>
-            </div>
-
-            <button
-                v-if="!showButton && !isSubscribed"
-                class="button button__send-m"
-                @click="handleSubmit('mobile')"
-            >
-                Enviar
-            </button>
-        </div> -->
     </div>
 
     <!--##### WEB -->
@@ -166,13 +54,22 @@
               src="~/static/img/conexoes-text.png"
             />
 
-            <button
+            <!-- <button
               v-if="showButton"
               class="button button__subscribe-w mt-16 mr-6"
               @click="subscribe()"
               >
                 Faça seu Chek-in
-            </button>
+            </button> -->
+            
+            <YSubscriptionForm
+              class="mt-5"
+              button-title="Faça seu Chek-in"
+              submit-button-title="Embarcar!"
+              :is-mobile="smAndDown"
+              :states="allStates"
+              :cities="allCities"
+            />
           </div>
 
           <img
@@ -181,121 +78,7 @@
           />
         </div>
 
-        <!-- <p class="page-content__date-w">em 26 de Setembro</p> -->
-
-        <!-- <div> 
-            <button
-                v-if="showButton"
-                class="button button__subscribe-w"
-                @click="subscribe()"
-            >
-                Inscreva-se
-            </button>
-            <form
-            v-if="!showButton && !isSubscribed"
-            class="form-w d-flex flex-column"
-            >
-            <div class="d-flex align-center justify-space-between">
-                <label class="label-w" for="name">Nome</label>
-                <input
-                id="name"
-                v-model="form.name"
-                style="width: 100%"
-                class="input-w"
-                type="text"
-                name="name"
-                placeholder="Digite seu nome completo"
-                />
-            </div>
-            <div class="d-flex align-center justify-space-between">
-                <label class="label-w" for="email">Email</label>
-                <input
-                id="email"
-                v-model="form.email"
-                style="width: 100%"
-                class="input-w"
-                type="text"
-                name="email"
-                placeholder="Digite seu melhor email"
-                />
-            </div>
-            <div class="d-flex align-center justify-space-between mt-1">
-                <select
-                id="state"
-                v-model="form.state"
-                class="select-state select-state-w"
-                name="state"
-                form="stateform"
-                >
-                <option value="" disabled="disabled" selected="selected">
-                    Estado
-                </option>
-                <option
-                    v-for="(state, i) in allStates"
-                    :key="i"
-                    :value="state.value"
-                >
-                    {{ state.short }}
-                </option>
-                </select>
-
-                <select
-                id="city"
-                v-model="form.city"
-                :disabled="allCities.length == 0"
-                style="width: 100%"
-                class="select-state select-state-w"
-                name="city"
-                form="stateform"
-                >
-                <option value="" disabled="disabled" selected="selected">
-                    Cidade
-                </option>
-                <option
-                    v-for="(city, i) in allCities"
-                    :key="i"
-                    :value="city.value"
-                >
-                    {{ city.value }}
-                </option>
-                </select>
-            </div>
-            </form>
-
-            <p v-if="isSubscribed" class="page-content__subscribed-w">
-                Inscrição realizada com sucesso!
-            </p>
-            <div
-                v-if="isSubscribed"
-                class="d-flex flex-row align-center mb-4"
-            >
-                <span>
-                    <p class="page-content__date-w">
-                      Agora é sua vez de contribuir com o conexão!
-                    </p>
-                    <p class="page-content__date-w">
-                      Compartilhe o evento com seus amigos ;)
-                    </p>
-                </span>
-                <div @click="shareViaWhatsApp()">
-                    <span
-                    class="iconify"
-                    data-icon="mdi:whatsapp"
-                    style="color: #ef815d"
-                    data-width="52"
-                    data-height="52"
-                    ></span>
-                </div>
-            </div>
-
-            <button
-                v-if="!showButton && !isSubscribed"
-                class="button button__send-w"
-                @click="handleSubmit('web')"
-            >
-                Enviar
-            </button>
-        </div> -->
+        
     </div>
   </div>
   
@@ -317,15 +100,9 @@ export default {
   },
   data() {
     return {
-      showButton: true,
-      isSubscribed: false,
+      
       followBoxMobile: true,
-      form: {
-        name: '',
-        email: '',
-        state: '',
-        city: '',
-      },
+      
       allStates: [],
       allCities: [],
       oldLeads: [],
@@ -363,7 +140,7 @@ export default {
   },
   mounted() {
     this.allStates = this.formatDataFromIbge(this.allStatesOfBrazil)
-    this.getLeadsAsync();
+    // this.getLeadsAsync();
     // this.sendAnalyticsData()
   },
   methods: {
@@ -572,25 +349,13 @@ $color-tertiary: #e78f12;
 
     &__theme {
         &-w {
-            height: 15vh;
-            width: 56vw;
+            height: 14vh;
+            width: 52vw;
         }
         &-m {
             height: 12vh;
             width: 75vw;
-        }
-    }
-
-    &__theme-infos {
-        &-w {
-            height: 240px;
-            width: 246px;
-        }
-        &-m {
-            height: 68px;
-            width: 280px;
-            position: absolute;
-            bottom: 120px;
+            max-width: 420px;
         }
     }
 
@@ -605,215 +370,30 @@ $color-tertiary: #e78f12;
         }
     }
 
+    &__theme-infos {
+        &-w {
+            height: 240px;
+            width: 246px;
+        }
+        &-m {
+            height: 74px;
+            width: 296px;
+            position: absolute;
+            bottom: 20vh;
+        }
+    }
+
     &__theme-code {
         &-w {
             height: 14.6vh;
             width: 336px;
         }
         &-m {
-            height: 36px;
-            width: 126px;
+            height: 42px;
+            width: 186px;
             position: absolute;
-            bottom: 60px;
+            bottom: 10vh;
         }
-    }
-
-    &__date {
-        &-w {
-            margin-left: 2vw;
-            font-size: 1.8rem;
-            font-weight: 500;
-            color: $color-primary;
-        }
-        &-m {
-            font-size: 1rem;
-            font-weight: 500;
-            text-align: center;
-            color: $color-primary;
-            margin-top: 0.5rem;
-        }
-    }
-
-    .button {
-      transition-duration: 0.4s;
-      color: $color-primary;
-      text-transform: uppercase;
-      border: 2px solid $color-primary;
-      border-radius: 60px;
-      cursor: pointer;
-      &:hover {
-        outline: none;
-        border: 2px solid $color-primary-dark;
-        color: $color-primary-dark;
-      }
-      &__subscribe {
-        &-w {
-          // font-family: 'Quicksand';
-          font-family: 'Balsamiq Sans';
-          font-size: 36px;
-          font-weight: 500;
-          padding: 4px 32px;
-        }
-        &-m {
-          font-size: 28px;
-          font-weight: 500;
-          padding: 6px 32px;
-          margin: 42px 0;
-        }
-      }
-      &__send {
-        &-w {
-          font-size: 18px;
-          font-weight: 400;
-          padding: 4px 42px;
-          margin: 14px 0;
-          margin-left: 8.5rem;
-        }
-        &-m {
-          font-size: 18px;
-          font-weight: 400;
-          padding: 6px 32px;
-          margin: 12px 0;
-          margin-left: 5rem;
-        }
-      }
-    }
-
-    .input {
-      &-w[type='text'] {
-        padding: 12px 20px;
-        margin: 6px 0;
-        display: inline-block;
-        border: 2px solid $color-primary;
-        border-radius: 24px;
-        box-sizing: border-box;
-        color: $color-primary;
-      }
-      &-m[type='text'] {
-        padding: 8px 6px;
-        margin: 6px 0;
-        padding-left: 12px;
-        display: inline-block;
-        border: 2px solid $color-primary;
-        border-radius: 24px;
-        box-sizing: border-box;
-        color: $color-primary;
-      }
-    }
-
-    input:focus {
-      outline: none;
-      border: 2px solid $color-primary-dark;
-    }
-
-    .form {
-      &-w {
-        margin: 10px 0;
-        max-width: 34vw;
-      }
-      &-m {
-        margin: 8px 0;
-      }
-    }
-
-    .label {
-      &-w {
-        font-size: 20px;
-        font-weight: 500;
-        color: $color-primary-dark;
-        margin-right: 32px;
-      }
-      &-m {
-        font-size: 12px;
-        font-weight: 500;
-        color: $color-primary-dark;
-        margin-right: 26px;
-      }
-    }
-
-    .select-state {
-      -webkit-appearance: none;
-      color:  $color-primary;
-      margin: 0 4px;
-      border: 2px solid  $color-primary;
-      border-radius: 24px;
-      text-align: center;
-      cursor: pointer;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      transition-duration: 0.4s;
-
-      option {
-        color: #223254;
-        text-overflow: ellipsis;
-        overflow: hidden;
-      }
-
-      option[value=''][disabled] {
-        display: none;
-      }
-
-      &:focus {
-        outline: none;
-        border: 2px solid  $color-primary-dark;
-      }
-
-      &:hover {
-        outline: none;
-        border: 2px solid  $color-primary-dark;
-        color:  $color-primary-dark;
-      }
-
-      &[disabled] {
-        outline: none;
-        border: 2px solid $color-primary-light;
-        cursor: not-allowed;
-      }
-    }
-
-    .select-state-w {
-      padding: 8px 20px;
-      font-size: 20px;
-
-      option {
-        font-size: 14px;
-      }
-    }
-
-    .select-state-m {
-      padding: 10px 6px;
-      font-size: 14px;
-
-      option {
-        font-size: 14px;
-      }
-    }
-
-    &__subscribed {
-      &-w {
-        font-size: 2.5rem;
-        font-weight: 500;
-        color: $color-primary-dark;
-        margin: 36px 0 36px 2vw;
-      }
-      &-m {
-        font-size: 1.5rem;
-        font-weight: 500;
-        color: $color-primary-dark;
-        text-align: center;
-        margin: 28px 0;
-      }
-    }
-
-    .iconify {
-      transition-duration: 0.4s;
-      cursor: pointer;
-      margin-left: 12px;
-
-      &:hover {
-        margin-bottom: 6px;
-      }
     }
 }
 
