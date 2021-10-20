@@ -1,6 +1,6 @@
 <template>
-  <v-row>
-        <div v-if="!isMobile"> 
+  <v-row justify="center" align="center">
+        <v-col v-if="!isMobile" cols="12" class="d-flex flex-column align-center"> 
             <button
                 v-if="showButton"
                 class="button button__subscribe-w"
@@ -10,19 +10,23 @@
             </button>
             <div
                 v-if="!showButton && !isSubscribed"
-                class="form-w d-flex flex-column"
+                class="d-flex flex-column"
             >
                 <v-text-field
                     v-model="form.name"
                     label="Digite seu nome completo"
                     placeholder="Ex: Marcos Rogério"
+                    :error-messages="nameErrors"
                     filled
+                    dense
                 ></v-text-field>
                 <v-text-field
                     v-model="form.email"
                     label="Digite seu melhor email"
                     placeholder="Ex: meuemail@email.com"
+                    :error-messages="emailErrors"
                     filled
+                    dense
                 ></v-text-field>
                 <v-row>
                     <v-col cols="4">
@@ -33,7 +37,9 @@
                             :disabled="states.length == 0"
                             label="Estado"
                             placeholder="Selecione seu estado"
+                            :error-messages="stateErrors"
                             filled
+                            dense
                         ></v-select>
                     </v-col>
                     <v-col cols="8">
@@ -44,7 +50,9 @@
                             :disabled="cities.length == 0"
                             label="Cidade"
                             placeholder="Selecione sua cidade"
+                            :error-messages="cityErrors"
                             filled
+                            dense
                         ></v-select>
                     </v-col>
                 </v-row>
@@ -67,11 +75,11 @@
                 </span>
                 <div @click="shareViaWhatsApp()">
                     <span
-                    class="iconify"
-                    data-icon="mdi:whatsapp"
-                    style="color: #ef815d"
-                    data-width="52"
-                    data-height="52"
+                        class="iconify"
+                        data-icon="mdi:whatsapp"
+                        style="color: #ef815d"
+                        data-width="52"
+                        data-height="52"
                     ></span>
                 </div>
             </div>
@@ -79,18 +87,83 @@
             <button
                 v-if="!showButton && !isSubscribed"
                 class="button button__send-w"
-                @click="handleSubmit('web')"
+                @click="submit('web')"
             >
                 {{submitButtonTitle}}
             </button>
-        </div>
-        <div v-else></div>
+        </v-col>
+
+        <v-col v-else cols="12" class="d-flex flex-column align-center">
+            <button
+                v-if="showButton"
+                class="button button__subscribe-m"
+                @click="showButton = false"
+            >
+                {{buttonTitle}}
+            </button>
+
+            <div
+                v-if="!showButton && !isSubscribed"
+                class="d-flex flex-column"
+            >
+                <v-text-field
+                    v-model="form.name"
+                    label="Digite seu nome completo"
+                    placeholder="Ex: Marcos Rogério"
+                    :error-messages="nameErrors"
+                    filled
+                    dense
+                ></v-text-field>
+                <v-text-field
+                    v-model="form.email"
+                    label="Digite seu melhor email"
+                    placeholder="Ex: meuemail@email.com"
+                    :error-messages="emailErrors"
+                    filled
+                    dense
+                ></v-text-field>
+                <v-select
+                    v-model="form.state"
+                    :items="states"
+                    item-text="value"
+                    :disabled="states.length == 0"
+                    label="Estado"
+                    placeholder="Selecione seu estado"
+                    :error-messages="stateErrors"
+                    filled
+                    dense
+                ></v-select>
+                <v-select
+                    v-model="form.city"
+                    :items="cities"
+                    item-text="value"
+                    :disabled="cities.length == 0"
+                    label="Cidade"
+                    placeholder="Selecione sua cidade"
+                    :error-messages="cityErrors"
+                    filled
+                    dense
+                ></v-select>
+            </div>
+
+            <button
+                v-if="!showButton && !isSubscribed"
+                class="button button__send-m d-flex justify-center"
+                @click="submit('web')"
+            >
+                {{submitButtonTitle}}
+            </button>
+        </v-col>
   </v-row>
 </template>
 
 <script>
+import { validationMixin } from "vuelidate"
+import { required } from "vuelidate/lib/validators"
+
 export default {
     name: 'YSubscriptionForm',
+    mixins: [validationMixin],
     props: {
         buttonTitle: {
             type: String,
@@ -102,6 +175,10 @@ export default {
             default: '',
         },
         isMobile: {
+            type: Boolean,
+            default: false,
+        },
+        isSubscribed: {
             type: Boolean,
             default: false,
         },
@@ -117,13 +194,68 @@ export default {
     data() {
         return {
             showButton: true,
-            isSubscribed: false,
             form: {
                 name: '',
                 email: '',
                 state: '',
                 city: '',
             },
+        }
+    },
+    validations() {
+        return {
+            form: {
+                name: { required },
+                email: { required },
+                state: { required },
+                city: { required }
+            }
+        }
+    },
+    computed: {
+        nameErrors() {
+            return this.$v.form.name.$dirty &&
+                !this.$v.form.name.required
+                ? ['Preenchimento obrigatório']
+                : []
+        },
+        emailErrors() {
+            return this.$v.form.email.$dirty &&
+                !this.$v.form.email.required
+                ? ['Preenchimento obrigatório']
+                : []
+        },
+        stateErrors() {
+            return this.$v.form.state.$dirty &&
+                !this.$v.form.state.required
+                ? ['Preenchimento obrigatório']
+                : []
+        },
+        cityErrors() {
+            return this.$v.form.city.$dirty &&
+                !this.$v.form.city.required
+                ? ['Preenchimento obrigatório']
+                : []
+        },
+            
+    },
+    watch: {
+        'form.state'(paylod) {
+            if (paylod) {
+                const chosenState = this.states.find(
+                    (state) => state.value === paylod
+                )
+                this.form.city = ''
+                this.$emit('chosedState', chosenState)
+            }
+        }
+    },
+    methods: {
+        submit(pageType) {
+            this.$v.$touch()
+            if (this.$v.$invalid) return
+
+            this.$emit('submitForm', {form: this.form, type: pageType})
         }
     }
 }
@@ -159,7 +291,7 @@ $color-tertiary: #e78f12;
             padding: 4px 32px;
         }
         &-m {
-            font-size: 28px;
+            font-size: 22px;
             font-weight: 500;
             padding: 6px 26px;
         }
@@ -170,14 +302,11 @@ $color-tertiary: #e78f12;
             font-size: 18px;
             font-weight: 400;
             padding: 4px 42px;
-            margin-left: 8.5rem;
         }
         &-m {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 400;
             padding: 6px 32px;
-            margin: 12px 0;
-            margin-left: 5rem;
         }
     }
 }

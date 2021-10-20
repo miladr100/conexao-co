@@ -17,22 +17,25 @@
             />
 
             <YSubscriptionForm
-              class="mt-5"
+              class="page-content__subscription-form-m mb-8"
               button-title="Faça seu Chek-in"
               submit-button-title="Embarcar!"
               :is-mobile="smAndDown"
               :states="allStates"
               :cities="allCities"
+              :is-subscribed="isSubscribed"
+              @chosedState="getAndSetStaticCities"
+              @submitForm="console"
             />
           </div>
 
           <img
-            class="page-content__theme-infos-m ml-4"
+            class="page-content__theme-infos-m mb-10 ml-4"
             src="~/static/img/conexoes-infos-mobile.png"
           />
 
           <img
-            class="page-content__theme-code-m ml-4"
+            class="page-content__theme-code-m mb-5 ml-4"
             src="~/static/img/conexoes-code-mobile.png"
           />
         </div>
@@ -40,45 +43,45 @@
 
     <!--##### WEB -->
     <div v-else class="page-content" style="border-radius: 60px;">
-        <div class="page-content__header-w d-flex align-center">
-          <img
-              class="page-content__theme-title-w ml-12"
-              src="~/static/img/conexoes-title.png"
-            />
-        </div>
-
-        <div class="page-content-web d-flex justify-space-between">
-          <div class="d-flex flex-column align-center">
-            <img
-              class="page-content__theme-w mt-2"
-              src="~/static/img/conexoes-text.png"
-            />
-
-            <!-- <button
-              v-if="showButton"
-              class="button button__subscribe-w mt-16 mr-6"
-              @click="subscribe()"
-              >
-                Faça seu Chek-in
-            </button> -->
-            
-            <YSubscriptionForm
-              class="mt-5"
-              button-title="Faça seu Chek-in"
-              submit-button-title="Embarcar!"
-              :is-mobile="smAndDown"
-              :states="allStates"
-              :cities="allCities"
-            />
-          </div>
-
-          <img
-            class="page-content__theme-infos-w mt-2"
-            src="~/static/img/conexoes-infos.png"
+      <div class="page-content__header-w d-flex align-center">
+        <img
+            class="page-content__theme-title-w ml-12"
+            src="~/static/img/conexoes-title.png"
           />
-        </div>
+      </div>
 
-        
+      <v-row class="page-content-web" justify="space-between">
+        <v-col cols="9" class="d-flex flex-column">
+          <img
+            class="page-content__theme-w mt-2"
+            src="~/static/img/conexoes-text.png"
+          />
+          
+          <YSubscriptionForm
+            class="page-content__subscription-form-w d-flex justify-center ml-4"
+            button-title="Faça seu Chek-in"
+            submit-button-title="Embarcar!"
+            :is-mobile="smAndDown"
+            :states="allStates"
+            :cities="allCities"
+            :is-subscribed="isSubscribed"
+            @chosedState="getAndSetStaticCities"
+            @submitForm="console"
+          />
+        </v-col>
+
+        <v-col cols="3">
+            <img 
+              class="page-content__theme-infos-w mt-2"
+              src="~/static/img/conexoes-infos.png"
+            />
+
+            <img
+              class="page-content__theme-code-w"
+              src="~/static/img/conexoes-code-mobile.png"
+            />
+        </v-col>
+      </v-row>
     </div>
   </div>
   
@@ -100,9 +103,8 @@ export default {
   },
   data() {
     return {
-      
+      isSubscribed: false,
       followBoxMobile: true,
-      
       allStates: [],
       allCities: [],
       oldLeads: [],
@@ -123,20 +125,11 @@ export default {
     },
   },
   watch: {
-    'form.state'(paylod) {
-      if (paylod) {
-        const chosenState = this.allStates.find(
-          (state) => state.value === paylod
-        )
-        this.form.city = ''
-        this.getAndSetCitiesByStateCodeAsync(chosenState)
-      }
-    },
-    'form.name'(payload) {
-      if(payload) {
-        console.log(this.oldLeads.filter(lead => lead.name.toLowerCase().includes(payload.toLowerCase())))
-      }
-    }
+    // 'form.name'(payload) {
+    //   if(payload) {
+    //     console.log(this.oldLeads.filter(lead => lead.name.toLowerCase().includes(payload.toLowerCase())))
+    //   }
+    // }
   },
   mounted() {
     this.allStates = this.formatDataFromIbge(this.allStatesOfBrazil)
@@ -144,6 +137,9 @@ export default {
     // this.sendAnalyticsData()
   },
   methods: {
+    console(data) {
+      console.log(data)
+    },
     async getLeadsAsync() {
 
           const { data } = await supabase
@@ -151,10 +147,6 @@ export default {
               .select(`*`)
             this.oldLeads = this.organizeLeads(data.filter(lead => lead.conexao !== ACTUAL_CONECXAO))
             // console.log(this.oldLeads);
-    },
-    subscribe() {
-      this.sendAnalyticsData('button_subscribe')
-      this.showButton = false
     },
     formatDataFromIbge(states) {
       return states.reduce((acc, state) => {
@@ -168,18 +160,17 @@ export default {
         ]
       }, [])
     },
-    getAndSetCitiesByStateCodeAsync(state) {
+    async getAndSetCitiesByStateCodeAsync(state) {
       try {
-        // const { data } = await this.$axios.get(
-        // `${process.env.ibgeApi}localidades/estados/${state.id}/municipios`
-        // )
-        // this.allCities = this.formatDataFromIbge(data)
-        this.getStaticCities(state)
+        const { data } = await this.$axios.get(
+          `${process.env.ibgeApi}localidades/estados/${state.id}/municipios`
+        )
+        this.allCities = this.formatDataFromIbge(data)
       } catch (err) {
         console.error(err)
       }
     },
-    getStaticCities(stateSelected) {
+    getAndSetStaticCities(stateSelected) {
       const cities = statesAndCities.estados.filter(
         (state) => state.sigla === stateSelected.short
       )[0]
@@ -313,7 +304,7 @@ $color-tertiary: #e78f12;
 
 .page-content {
     background-color: $color-secondary;
-    height: 88vh;
+    min-height: 90vh;
     margin-top: 4vh;
     margin-left: 4vw;
     margin-right: 4vw;
@@ -378,22 +369,34 @@ $color-tertiary: #e78f12;
         &-m {
             height: 74px;
             width: 296px;
-            position: absolute;
-            bottom: 20vh;
+            // position: absolute;
+            // bottom: 20vh;
         }
     }
 
     &__theme-code {
         &-w {
-            height: 14.6vh;
-            width: 336px;
+            height: 52px;
+            width: 248px;
+            position: absolute;
+            bottom: 12vh;
+            right: 8vw;
         }
         &-m {
             height: 42px;
             width: 186px;
-            position: absolute;
-            bottom: 10vh;
         }
+    }
+
+    &__subscription-form {
+      &-w {
+        max-width: 46vw;
+      }
+      &-m {
+        min-height: 40vh;
+        max-width: 80vw;
+        margin: 18px 0;
+      }
     }
 }
 

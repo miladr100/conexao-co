@@ -29,7 +29,8 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    '~/plugins/vueToastNotification.js',
+    { src: '~/plugins/vueToastNotification.js', ssr: true},
+    { src: '~/plugins/vuelidate.js', ssr: true}
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components

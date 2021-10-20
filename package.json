@@ -19,6 +19,7 @@
     "nuxt": "^2.15.7",
     "vue-materialize-datatable": "^1.0.4",
     "vue-toast-notification": "^0.6.2",
+    "vuelidate": "^0.7.6",
     "vuetify": "^2.5.5"
   },
   "devDependencies": {
