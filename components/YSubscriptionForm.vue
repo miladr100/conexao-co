@@ -196,9 +196,9 @@
         >
             <v-card>
                 <v-card-title class="text-h6" style="color: #011e41;">
-                    Você já se cadastrou no Conexão anteriormente?
+                    Já se cadastrou no Conexão?
                 </v-card-title>
-                <v-card-text>Procure seu cadastro para facilitar seu cadastro somente atualizando suas informações.</v-card-text>
+                <v-card-text>Procure sua inscrição anterior para facilitar seu cadastro somente atualizando suas informações.</v-card-text>
                 <v-container>
                     <v-autocomplete
                         v-model="form.name"
