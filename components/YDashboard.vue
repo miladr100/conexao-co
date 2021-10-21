@@ -72,7 +72,7 @@ import { cloneDeep } from "lodash"
 import { supabase } from "~/plugins/supabase";
 import sharedFunctions from '~/shared/mixins/sharedFunctions.mixin'
 
-const ACTUAL_CONECXAO = 4;
+const ACTUAL_CONECXAO = 5;
 
   export default {
     name: "YDashboard",

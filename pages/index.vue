@@ -15,7 +15,7 @@
               class="page-content__theme-m mt-2"
               src="~/static/img/conexoes-text-mobile.png"
             />
-
+            
             <YSubscriptionForm
               class="page-content__subscription-form-m mb-8"
               button-title="Faça seu Chek-in"
@@ -27,7 +27,8 @@
               :is-subscribed="isSubscribed"
               :selected-lead="selectedLead"
               @chosedState="getAndSetStaticCities"
-              @submitForm="console"
+              @submitForm="handleSubmit"
+              @selectedName="searchSelectedLead"
             />
           </div>
 
@@ -70,7 +71,7 @@
             :is-subscribed="isSubscribed"
             :selected-lead="selectedLead"
             @chosedState="getAndSetStaticCities"
-            @submitForm="console"
+            @submitForm="handleSubmit"
             @selectedName="searchSelectedLead"
           />
         </v-col>
@@ -88,6 +89,36 @@
         </v-col>
       </v-row>
     </div>
+
+    <v-dialog
+      v-model="dialog"
+      persistent
+      max-width="500"
+    >
+      <v-card>
+        <v-card-title class="text-h6" style="color: #011e41;">
+            Erro de cadastro!
+        </v-card-title>
+        <v-card-text>O email -{{errorLead.email}}- já está cadastrado com o nome -{{errorLead.name}}-. Deseja usar este email para atualizar o cadastro?</v-card-text>
+        <v-card-actions>
+            <v-btn
+                color="#3cb4e5"
+                text
+                @click="dialog = false"
+            >
+                Usar outro e-mail
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn
+                color="#3cb4e5"
+                text
+                @click="useSelectedLeadEmail"
+            >
+                Usar este e-mail
+            </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
   
 </template>
@@ -116,6 +147,10 @@ export default {
     return {
       isSubscribed: false,
       followBoxMobile: true,
+      dialog: false,
+      errorLead: {
+        name: '',
+      },
       selectedLead: {},
       allStates: [],
       allCities: [],
@@ -144,9 +179,6 @@ export default {
     // this.sendAnalyticsData()
   },
   methods: {
-    console(data) {
-      console.log(data)
-    },
     async getAllLeadsAsync() {
         const allLeads = await this.getLeadsAsync();
         this.oldLeads = allLeads.filter(lead => lead.conexao !== ACTUAL_CONECXAO);
@@ -194,12 +226,13 @@ export default {
       })
       this.allCities = formattedCities
     },
-    getDataToSubmit() {
+    getDataToSubmit(form) {
       return {
-        name: this.form.name,
-        email: this.form.email.toLowerCase(),
-        state: this.form.state,
-        city: this.form.city,
+        name: form.name,
+        email: form.email.toLowerCase(),
+        state: form.state,
+        city: form.city,
+        conexao: ACTUAL_CONECXAO,
       }
     },
     searchSelectedLead(leadName) {
@@ -212,20 +245,40 @@ export default {
           city: selectedLead[0].city,
         }
     },
-    handleSubmit(deviceType) {
+    async createNewLeadAsync(form, deviceType) {
       try {
-        this.$axios.setHeader('apikey', process.env.SUPABASE_API_KEY)
-        this.$axios.post('leads', {
-          ...this.getDataToSubmit(),
+        const checkEmailLead = await this.selectLeadByEmail(form.email)
+        if(checkEmailLead.length > 0) {
+          this.errorLead = checkEmailLead[0];
+          this.dialog = true;
+          return
+        }
+        this.insertNewLeadAsync({
+          ...this.getDataToSubmit(form),
           device: deviceType,
-        })
-        this.isSubscribed = true
-      } catch (err) {
-        this.$toast.open({
-          message: 'Falha ao enviar dados, por favor tente novamente.',
-          type: 'error',
-        })
+        });
+        this.isSubscribed = true;
+      } catch (e) {
+        console.error(e)
       }
+    },
+    async handleSubmit(data) {
+      if(Object.keys(this.selectedLead).length > 0) {
+        try {
+            await this.updateLeadAsync({
+            ...this.getDataToSubmit(data.form),
+            device: data.type,
+          });
+          this.isSubscribed = true;
+        } catch (e) {
+          console.error(e)
+        }
+      }
+      else this.createNewLeadAsync(data.form, data.type);
+    },
+    useSelectedLeadEmail() {
+      this.selectedLead = this.errorLead;
+      this.dialog = false;
     },
     sendAnalyticsData(typeData = 'page_read') {
       try {
@@ -235,21 +288,6 @@ export default {
       } catch (err) {
         console.error(err)
       }
-    },
-    shareViaWhatsApp() {
-      let header = 'Oi oi, tudo bem? :)'
-      const name = this.form.name?.split(' ')[0]
-      if (name) header = `Oi oi, aqui é ${name} :)`
-      const message = window.encodeURIComponent(`${header}
-      👋 Vim te convidar para a 5ª Conexão Centro Oeste, vamos viajar pelo Brasil! Oiapoque ao Chuí"
-      Você não vai deixar escapar essa oportunidade, não é mesmo?
-      📆 Domingo, 17 de novembro, às 16 hrs (Brasília) e 15 hrs (MS e MT)
-      
-      Inscreva-se agora pelo link: https://conexaoco.vercel.app/`)
-      window
-        .open(`https://api.whatsapp.com/send?text=${message}`, '_blank')
-        .focus()
-      this.sendAnalyticsData('share_whatsapp')
     },
     followInstagram() {
       window
@@ -355,8 +393,6 @@ $color-tertiary: #e78f12;
         &-m {
             height: 74px;
             width: 296px;
-            // position: absolute;
-            // bottom: 20vh;
         }
     }
 
@@ -381,6 +417,7 @@ $color-tertiary: #e78f12;
       &-m {
         min-height: 40vh;
         max-width: 80vw;
+        min-width: 70vw;
         margin: 18px 0;
       }
     }
