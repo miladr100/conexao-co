@@ -23,7 +23,9 @@
               :is-mobile="smAndDown"
               :states="allStates"
               :cities="allCities"
+              :names="leadNames"
               :is-subscribed="isSubscribed"
+              :selected-lead="selectedLead"
               @chosedState="getAndSetStaticCities"
               @submitForm="console"
             />
@@ -64,9 +66,12 @@
             :is-mobile="smAndDown"
             :states="allStates"
             :cities="allCities"
+            :names="leadNames"
             :is-subscribed="isSubscribed"
+            :selected-lead="selectedLead"
             @chosedState="getAndSetStaticCities"
             @submitForm="console"
+            @selectedName="searchSelectedLead"
           />
         </v-col>
 
@@ -88,13 +93,19 @@
 </template>
 
 <script>
+import YSubscriptionForm from '~/components/YSubscriptionForm'
 import statesAndCities from '~/static/json/estados-cidades.json'
-import { supabase } from "~/plugins/supabase";
+// import { supabase } from "~/plugins/supabase";
+import sharedFunctions from '~/shared/mixins/sharedFunctions.mixin'
 
 const ACTUAL_CONECXAO = 5;
 
 export default {
   name: 'YspLeadsIndex',
+  components: {
+    YSubscriptionForm,
+  },
+  mixins: [sharedFunctions],
   async asyncData({ $axios }) {
     const allStatesOfBrazil = await $axios.$get(
       `${process.env.brasilApi}ibge/uf/v1`
@@ -105,9 +116,11 @@ export default {
     return {
       isSubscribed: false,
       followBoxMobile: true,
+      selectedLead: {},
       allStates: [],
       allCities: [],
       oldLeads: [],
+      leadNames: [],
     }
   },
   computed: {
@@ -124,29 +137,19 @@ export default {
       return this.$vuetify.breakpoint.xsOnly
     },
   },
-  watch: {
-    // 'form.name'(payload) {
-    //   if(payload) {
-    //     console.log(this.oldLeads.filter(lead => lead.name.toLowerCase().includes(payload.toLowerCase())))
-    //   }
-    // }
-  },
-  mounted() {
-    this.allStates = this.formatDataFromIbge(this.allStatesOfBrazil)
-    // this.getLeadsAsync();
+  async mounted() {
+    this.getAndSetStaticStates();
+    await this.getAllLeadsAsync();
+    this.leadNames = this.oldLeads.reduce((acc, cur) => { return [...acc, cur.name]}, [])
     // this.sendAnalyticsData()
   },
   methods: {
     console(data) {
       console.log(data)
     },
-    async getLeadsAsync() {
-
-          const { data } = await supabase
-              .from("leads")
-              .select(`*`)
-            this.oldLeads = this.organizeLeads(data.filter(lead => lead.conexao !== ACTUAL_CONECXAO))
-            // console.log(this.oldLeads);
+    async getAllLeadsAsync() {
+        const allLeads = await this.getLeadsAsync();
+        this.oldLeads = allLeads.filter(lead => lead.conexao !== ACTUAL_CONECXAO);
     },
     formatDataFromIbge(states) {
       return states.reduce((acc, state) => {
@@ -170,6 +173,15 @@ export default {
         console.error(err)
       }
     },
+    getAndSetStaticStates() {
+      this.allStates = statesAndCities.estados.map((state, index) => {
+        return {
+          id: index,
+          short: state.sigla,
+          value: state.nome,
+        }
+      })
+    },
     getAndSetStaticCities(stateSelected) {
       const cities = statesAndCities.estados.filter(
         (state) => state.sigla === stateSelected.short
@@ -182,40 +194,6 @@ export default {
       })
       this.allCities = formattedCities
     },
-    validate() {
-      if (!this.form.name) {
-        this.$toast.open({
-          message: 'Por favor preencha seu nome completo',
-          type: 'warning',
-        })
-        return false
-      }
-      if (!this.form.email) {
-        this.$toast.open({
-          message: 'Por favor preencha seu email',
-          type: 'warning',
-        })
-        return false
-      }
-      const regexEmail =
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      if (!this.form.email.match(regexEmail)) {
-        this.$toast.open({
-          message: 'Por favor insira um email válido',
-          type: 'warning',
-        })
-        return false
-      }
-      // if(!this.form.state) {
-      //   this.$toast.open({message: "Por favor selecione seu estado", type: "warning"})
-      //   return false
-      // }
-      // if(!this.form.city) {
-      //   this.$toast.open({message: "Por favor selecione sua cidade", type: "warning"})
-      //   return false
-      // }
-      return true
-    },
     getDataToSubmit() {
       return {
         name: this.form.name,
@@ -224,21 +202,29 @@ export default {
         city: this.form.city,
       }
     },
-    handleSubmit(deviceType) {
-      if (!this.isSubscribed && this.validate()) {
-        try {
-          this.$axios.setHeader('apikey', process.env.SUPABASE_API_KEY)
-          this.$axios.post('leads', {
-            ...this.getDataToSubmit(),
-            device: deviceType,
-          })
-          this.isSubscribed = true
-        } catch (err) {
-          this.$toast.open({
-            message: 'Falha ao enviar dados, por favor tente novamente.',
-            type: 'error',
-          })
+    searchSelectedLead(leadName) {
+      const selectedLead = this.oldLeads.filter(lead => lead.name.toLowerCase().trim() === leadName.toLowerCase().trim())
+      if (selectedLead !== 0) 
+        this.selectedLead = {
+          name: selectedLead[0].name,
+          email: selectedLead[0].email,
+          state: selectedLead[0].state,
+          city: selectedLead[0].city,
         }
+    },
+    handleSubmit(deviceType) {
+      try {
+        this.$axios.setHeader('apikey', process.env.SUPABASE_API_KEY)
+        this.$axios.post('leads', {
+          ...this.getDataToSubmit(),
+          device: deviceType,
+        })
+        this.isSubscribed = true
+      } catch (err) {
+        this.$toast.open({
+          message: 'Falha ao enviar dados, por favor tente novamente.',
+          type: 'error',
+        })
       }
     },
     sendAnalyticsData(typeData = 'page_read') {
@@ -253,13 +239,13 @@ export default {
     shareViaWhatsApp() {
       let header = 'Oi oi, tudo bem? :)'
       const name = this.form.name?.split(' ')[0]
-      if (name) header = `Oi oi, aqui é ${this.form.name.split(' ')[0]} :)`
+      if (name) header = `Oi oi, aqui é ${name} :)`
       const message = window.encodeURIComponent(`${header}
-      👋 Vim te convidar para a 4ª Conexão Centro Oeste, com o tema A Primavera que existe em você!"
-      Conheça experiências e lições de vida de jovens, e saiba como eles superam os desafios da vida com o florescer da juventude!
-      📆 Domingo, 26 de setembro, às 16 hrs (Brasília) e 15 hrs (MS e MT)
+      👋 Vim te convidar para a 5ª Conexão Centro Oeste, vamos viajar pelo Brasil! Oiapoque ao Chuí"
+      Você não vai deixar escapar essa oportunidade, não é mesmo?
+      📆 Domingo, 17 de novembro, às 16 hrs (Brasília) e 15 hrs (MS e MT)
       
-      Inscreva-se agora pelo link: https://https://conexaoco.vercel.app/`)
+      Inscreva-se agora pelo link: https://conexaoco.vercel.app/`)
       window
         .open(`https://api.whatsapp.com/send?text=${message}`, '_blank')
         .focus()

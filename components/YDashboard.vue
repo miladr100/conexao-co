@@ -70,13 +70,13 @@
 <script>
 import { cloneDeep } from "lodash"
 import { supabase } from "~/plugins/supabase";
+import sharedFunctions from '~/shared/mixins/sharedFunctions.mixin'
 
 const ACTUAL_CONECXAO = 4;
 
   export default {
     name: "YDashboard",
-    components: {
-    },
+    mixins: [sharedFunctions],
     data () {
       return {
         allLeads: [],
@@ -141,18 +141,6 @@ const ACTUAL_CONECXAO = 4;
             } catch (err) {
                 this.$toast.open({message: "Falha ao obter leads", type: "error"})
             }
-        },
-        organizeLeads(arrLeads) {
-            return arrLeads.map(lead => {
-                const newLead = {...lead}
-                if(!lead.state) newLead.state = ' - '
-                if(!lead.city) newLead.city = ' - '
-                if(!lead.device) newLead.device = ' - '
-                if(!lead.phone) newLead.phone = ' - '
-                const time = `${newLead.created_at.split("T")[0]}`
-                newLead.created_at = time
-                return newLead
-            })
         },
         calcAnalytics() {
             this.numbOfMs = this.organizeLeads(this.allLeads.filter(lead => lead.state === "Mato Grosso do Sul")).length

@@ -8,18 +8,22 @@
             >
                 {{buttonTitle}}
             </button>
-            <div
+
+            <v-container
                 v-if="!showButton && !isSubscribed"
                 class="d-flex flex-column"
             >
-                <v-text-field
+                <v-autocomplete
                     v-model="form.name"
+                    :items="names"
                     label="Digite seu nome completo"
                     placeholder="Ex: Marcos Rogério"
                     :error-messages="nameErrors"
+                    full-width
+                    hide-no-data
                     filled
-                    dense
-                ></v-text-field>
+                    clearable
+                ></v-autocomplete>
                 <v-text-field
                     v-model="form.email"
                     label="Digite seu melhor email"
@@ -27,6 +31,7 @@
                     :error-messages="emailErrors"
                     filled
                     dense
+                    clearable
                 ></v-text-field>
                 <v-row>
                     <v-col cols="4">
@@ -56,7 +61,7 @@
                         ></v-select>
                     </v-col>
                 </v-row>
-            </div>
+            </v-container>
 
             <p v-if="isSubscribed" class="subscribed-w">
                 Inscrição realizada com sucesso!
@@ -113,6 +118,7 @@
                     :error-messages="nameErrors"
                     filled
                     dense
+                    clearable
                 ></v-text-field>
                 <v-text-field
                     v-model="form.email"
@@ -121,6 +127,7 @@
                     :error-messages="emailErrors"
                     filled
                     dense
+                    clearable
                 ></v-text-field>
                 <v-select
                     v-model="form.state"
@@ -189,7 +196,15 @@ export default {
         cities: {
             type: Array,
             default: () => [],
-        }
+        },
+        names: {
+            type: Array,
+            default: () => [],
+        },
+        selectedLead: {
+            type: Object,
+            default: () => {},
+        },
     },
     data() {
         return {
@@ -248,7 +263,17 @@ export default {
                 this.form.city = ''
                 this.$emit('chosedState', chosenState)
             }
-        }
+        },
+        // ARRUMAR AQUI
+        'form.name'(payload) {
+          if(payload) {
+            const selectedLead = this.names.filter(lead => lead.toLowerCase().trim() === payload.toLowerCase().trim())
+            if (selectedLead.length > 0) {
+                this.$emit('selectedName', selectedLead[0])
+                this.fillFormData(this.selectedLead)
+            }
+          }
+        },
     },
     methods: {
         submit(pageType) {
@@ -256,6 +281,11 @@ export default {
             if (this.$v.$invalid) return
 
             this.$emit('submitForm', {form: this.form, type: pageType})
+        },
+        fillFormData(payload) {
+            this.form.email = payload.email;
+            this.form.state = payload.state;
+            this.form.city = payload.city;
         }
     }
 }
